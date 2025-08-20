@@ -1,5 +1,5 @@
 
-import React, { useEffect, useState, useCallback } from 'react';
+import { useEffect, useState, useCallback, type FC, type ChangeEvent, type FormEvent } from 'react';
 import api from '../services/api';
 import { ShopInfo, UserRole } from '../types';
 import Button from '../components/ui/Button';
@@ -9,7 +9,7 @@ import Card from '../components/ui/Card';
 import { useAuth } from '../hooks/useAuth';
 import { useTranslation } from '../hooks/useTranslation';
 
-const Settings: React.FC = () => {
+const Settings: FC = () => {
     const { user } = useAuth();
     const { t, language, setLanguage } = useTranslation();
     const [shopInfo, setShopInfo] = useState<ShopInfo | null>(null);
@@ -38,13 +38,13 @@ const Settings: React.FC = () => {
         fetchShopInfo();
     }, [fetchShopInfo]);
 
-    const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+    const handleChange = (e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
         if (!shopInfo) return;
         const { name, value } = e.target;
         setShopInfo(prev => prev ? { ...prev, [name]: value } : null);
     };
 
-    const handleSubmit = async (e: React.FormEvent) => {
+    const handleSubmit = async (e: FormEvent) => {
         e.preventDefault();
         if (!shopInfo) return;
         setIsSaving(true);

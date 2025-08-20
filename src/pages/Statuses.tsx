@@ -1,5 +1,5 @@
 
-import React, { useEffect, useState, useCallback } from 'react';
+import { useEffect, useState, useCallback, type FC, type ChangeEvent, type FormEvent } from 'react';
 import api from '../services/api';
 import { OrderStatus } from '../types';
 import Table from '../components/ui/Table';
@@ -12,19 +12,19 @@ import { useTranslation } from '../hooks/useTranslation';
 
 const availableColors = ['gray', 'red', 'yellow', 'green', 'blue', 'indigo', 'purple', 'pink'];
 
-const StatusForm: React.FC<{ status?: OrderStatus | null; onSave: (status: Omit<OrderStatus, 'id'>) => void; onCancel: () => void }> = ({ status, onSave, onCancel }) => {
+const StatusForm: FC<{ status?: OrderStatus | null; onSave: (status: Omit<OrderStatus, 'id'>) => void; onCancel: () => void }> = ({ status, onSave, onCancel }) => {
     const { t } = useTranslation();
     const [formData, setFormData] = useState({
         name: status?.name || '',
         color: status?.color || 'gray',
     });
 
-    const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
+    const handleChange = (e: ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
         const { name, value } = e.target;
         setFormData(prev => ({ ...prev, [name]: value }));
     };
 
-    const handleSubmit = (e: React.FormEvent) => {
+    const handleSubmit = (e: FormEvent) => {
         e.preventDefault();
         onSave(formData);
     };
@@ -46,7 +46,7 @@ const StatusForm: React.FC<{ status?: OrderStatus | null; onSave: (status: Omit<
     );
 };
 
-const Statuses: React.FC = () => {
+const Statuses: FC = () => {
     const [statuses, setStatuses] = useState<OrderStatus[]>([]);
     const [loading, setLoading] = useState(true);
     const [isModalOpen, setIsModalOpen] = useState(false);

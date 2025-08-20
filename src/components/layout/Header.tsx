@@ -1,11 +1,11 @@
 
-import React from 'react';
+import type { FC } from 'react';
 import { useAuth } from '../../hooks/useAuth';
 import { useNavigate } from 'react-router-dom';
 import Button from '../ui/Button';
 import { useTranslation } from '../../hooks/useTranslation';
 
-const Header: React.FC = () => {
+const Header: FC = () => {
   const { user, logout } = useAuth();
   const { t } = useTranslation();
   const navigate = useNavigate();

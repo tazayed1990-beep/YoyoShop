@@ -1,5 +1,5 @@
 
-import React, { useEffect, useState, useCallback } from 'react';
+import { useEffect, useState, useCallback, type FC, type ChangeEvent, type FormEvent } from 'react';
 import api from '../services/api';
 import { Product } from '../types';
 import Table from '../components/ui/Table';
@@ -10,7 +10,7 @@ import Spinner from '../components/ui/Spinner';
 import Card from '../components/ui/Card';
 import { useTranslation } from '../hooks/useTranslation';
 
-const ProductForm: React.FC<{ product?: Product | null; onSave: (product: Omit<Product, 'id' | 'createdAt'>) => void; onCancel: () => void }> = ({ product, onSave, onCancel }) => {
+const ProductForm: FC<{ product?: Product | null; onSave: (product: Omit<Product, 'id' | 'createdAt'>) => void; onCancel: () => void }> = ({ product, onSave, onCancel }) => {
     const { t } = useTranslation();
     const [formData, setFormData] = useState({
         name: product?.name || '',
@@ -19,7 +19,7 @@ const ProductForm: React.FC<{ product?: Product | null; onSave: (product: Omit<P
         stockQuantity: product?.stockQuantity || 0,
     });
 
-    const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+    const handleChange = (e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
         const { name, value, type } = e.target;
         setFormData(prev => ({ 
             ...prev, 
@@ -27,7 +27,7 @@ const ProductForm: React.FC<{ product?: Product | null; onSave: (product: Omit<P
         }));
     };
 
-    const handleSubmit = (e: React.FormEvent) => {
+    const handleSubmit = (e: FormEvent) => {
         e.preventDefault();
         onSave(formData);
     };
@@ -49,7 +49,7 @@ const ProductForm: React.FC<{ product?: Product | null; onSave: (product: Omit<P
     );
 };
 
-const Products: React.FC = () => {
+const Products: FC = () => {
     const [products, setProducts] = useState<Product[]>([]);
     const [loading, setLoading] = useState(true);
     const [isModalOpen, setIsModalOpen] = useState(false);

@@ -1,15 +1,15 @@
 
-import React from 'react';
+import type { FC, ReactNode } from 'react';
 import Card from './ui/Card';
 
 interface DashboardCardProps {
   title: string;
   value: string | number;
-  icon: React.ReactNode;
+  icon: ReactNode;
   color: string;
 }
 
-const DashboardCard: React.FC<DashboardCardProps> = ({ title, value, icon, color }) => {
+const DashboardCard: FC<DashboardCardProps> = ({ title, value, icon, color }) => {
   return (
     <Card className="shadow-lg">
       <div className="flex items-center">

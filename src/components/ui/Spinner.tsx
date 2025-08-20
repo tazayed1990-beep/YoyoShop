@@ -1,7 +1,7 @@
 
-import React from 'react';
+import type { FC } from 'react';
 
-const Spinner: React.FC<{ size?: string }> = ({ size = '8' }) => {
+const Spinner: FC<{ size?: string }> = ({ size = '8' }) => {
   return (
     <svg 
       className={`animate-spin h-${size} w-${size} text-primary-500`} 

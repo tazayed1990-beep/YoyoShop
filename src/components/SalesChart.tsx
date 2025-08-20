@@ -1,5 +1,5 @@
 
-import React from 'react';
+import type { FC } from 'react';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
 import { SalesReportData } from '../types';
 import Card from './ui/Card';
@@ -9,7 +9,7 @@ interface SalesChartProps {
   title: string;
 }
 
-const SalesChart: React.FC<SalesChartProps> = ({ data, title }) => {
+const SalesChart: FC<SalesChartProps> = ({ data, title }) => {
   return (
     <Card title={title}>
         <div style={{ width: '100%', height: 400 }}>

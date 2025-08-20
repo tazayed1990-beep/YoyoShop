@@ -1,5 +1,5 @@
 
-import React, { useEffect, useState, useCallback } from 'react';
+import { useEffect, useState, useCallback, type FC } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import api from '../services/api';
 import { Order, ShopInfo } from '../types';
@@ -7,7 +7,7 @@ import Spinner from '../components/ui/Spinner';
 import Button from '../components/ui/Button';
 import { useTranslation } from '../hooks/useTranslation';
 
-const Invoice: React.FC = () => {
+const Invoice: FC = () => {
     const { orderId } = useParams<{ orderId: string }>();
     const navigate = useNavigate();
     const [order, setOrder] = useState<Order | null>(null);
@@ -58,7 +58,7 @@ const Invoice: React.FC = () => {
                         background-color: #fff !important;
                         color: #000 !important;
                     }
-                    .dark\\:bg-gray-800 {
+                    .dark\\:bg-gray-800, .dark\\:bg-gray-700 {
                         background-color: #fff !important;
                     }
                     .dark\\:text-white, .dark\\:text-gray-200, .dark\\:text-gray-300 {

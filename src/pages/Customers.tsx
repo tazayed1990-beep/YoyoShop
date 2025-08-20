@@ -1,5 +1,5 @@
 
-import React, { useEffect, useState, useCallback } from 'react';
+import { useEffect, useState, useCallback, type FC, type ChangeEvent, type FormEvent } from 'react';
 import api from '../services/api';
 import { User, UserRole } from '../types';
 import Table from '../components/ui/Table';
@@ -10,7 +10,7 @@ import Spinner from '../components/ui/Spinner';
 import Card from '../components/ui/Card';
 import { useTranslation } from '../hooks/useTranslation';
 
-const CustomerForm: React.FC<{ user?: User | null; onSave: (user: Omit<User, 'id' | 'createdAt' | 'role'>) => void; onCancel: () => void }> = ({ user, onSave, onCancel }) => {
+const CustomerForm: FC<{ user?: User | null; onSave: (user: Omit<User, 'id' | 'createdAt' | 'role'>) => void; onCancel: () => void }> = ({ user, onSave, onCancel }) => {
     const { t } = useTranslation();
     const [formData, setFormData] = useState({
         name: user?.name || '',
@@ -20,12 +20,12 @@ const CustomerForm: React.FC<{ user?: User | null; onSave: (user: Omit<User, 'id
         password: '',
     });
 
-    const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+    const handleChange = (e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
         const { name, value } = e.target;
         setFormData(prev => ({ ...prev, [name]: value }));
     };
 
-    const handleSubmit = (e: React.FormEvent) => {
+    const handleSubmit = (e: FormEvent) => {
         e.preventDefault();
         onSave(formData);
     };
@@ -48,7 +48,7 @@ const CustomerForm: React.FC<{ user?: User | null; onSave: (user: Omit<User, 'id
     );
 };
 
-const Customers: React.FC = () => {
+const Customers: FC = () => {
     const [customers, setCustomers] = useState<User[]>([]);
     const [loading, setLoading] = useState(true);
     const [isModalOpen, setIsModalOpen] = useState(false);

@@ -1,5 +1,5 @@
 
-import React, { useEffect, useState, useCallback, useMemo } from 'react';
+import { useEffect, useState, useCallback, useMemo, type FC, type FormEvent } from 'react';
 import { useNavigate } from 'react-router-dom';
 import api from '../services/api';
 import { Order, OrderStatus, Product, User, UserRole } from '../types';
@@ -12,12 +12,12 @@ import Input from '../components/ui/Input';
 import { useTranslation } from '../hooks/useTranslation';
 
 // Form for updating an existing order's status and payment
-const EditOrderForm: React.FC<{ order: Order; statuses: OrderStatus[], onSave: (orderId: number, data: { status: string; amountPaid: number }) => void; onCancel: () => void; }> = ({ order, statuses, onSave, onCancel }) => {
+const EditOrderForm: FC<{ order: Order; statuses: OrderStatus[], onSave: (orderId: number, data: { status: string; amountPaid: number }) => void; onCancel: () => void; }> = ({ order, statuses, onSave, onCancel }) => {
     const { t } = useTranslation();
     const [status, setStatus] = useState<string>(order.status);
     const [amountPaid, setAmountPaid] = useState<number>(order.amountPaid);
 
-    const handleSubmit = (e: React.FormEvent) => {
+    const handleSubmit = (e: FormEvent) => {
         e.preventDefault();
         onSave(order.id, { status, amountPaid: Number(amountPaid) });
     };
@@ -78,7 +78,7 @@ const EditOrderForm: React.FC<{ order: Order; statuses: OrderStatus[], onSave: (
 };
 
 // Form for creating a new order
-const AddOrderForm: React.FC<{ customers: User[]; products: Product[]; statuses: OrderStatus[]; onSave: (orderData: any) => void; onCancel: () => void; }> = ({ customers, products, statuses, onSave, onCancel }) => {
+const AddOrderForm: FC<{ customers: User[]; products: Product[]; statuses: OrderStatus[]; onSave: (orderData: any) => void; onCancel: () => void; }> = ({ customers, products, statuses, onSave, onCancel }) => {
     const { t } = useTranslation();
     const [userId, setUserId] = useState<number | ''>('');
     const [status, setStatus] = useState<string>(statuses[0]?.name || '');
@@ -111,7 +111,7 @@ const AddOrderForm: React.FC<{ customers: User[]; products: Product[]; statuses:
         setItems(prev => prev.filter(item => item.productId !== productId));
     };
 
-    const handleSubmit = (e: React.FormEvent) => {
+    const handleSubmit = (e: FormEvent) => {
         e.preventDefault();
         if (!userId || items.length === 0) {
             alert(t('alert_select_customer_and_item'));
@@ -191,7 +191,7 @@ const AddOrderForm: React.FC<{ customers: User[]; products: Product[]; statuses:
 };
 
 
-const Orders: React.FC = () => {
+const Orders: FC = () => {
     const [orders, setOrders] = useState<Order[]>([]);
     const [statuses, setStatuses] = useState<OrderStatus[]>([]);
     const [customers, setCustomers] = useState<User[]>([]);

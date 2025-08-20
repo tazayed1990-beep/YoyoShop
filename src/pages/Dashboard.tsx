@@ -1,12 +1,12 @@
 
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState, type FC } from 'react';
 import DashboardCard from '../components/DashboardCard';
 import api from '../services/api';
 import Spinner from '../components/ui/Spinner';
 import { Order, Product, User, UserRole } from '../types';
 import { useTranslation } from '../hooks/useTranslation';
 
-const Dashboard: React.FC = () => {
+const Dashboard: FC = () => {
     const [stats, setStats] = useState({ users: 0, customers: 0, products: 0, orders: 0, sales: 0 });
     const [loading, setLoading] = useState(true);
     const { t } = useTranslation();

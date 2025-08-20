@@ -1,14 +1,14 @@
 
-import React from 'react';
+import type { FC, ReactNode } from 'react';
 
 interface CardProps {
-  children: React.ReactNode;
+  children: ReactNode;
   title?: string;
   className?: string;
-  actions?: React.ReactNode;
+  actions?: ReactNode;
 }
 
-const Card: React.FC<CardProps> = ({ children, title, className = '', actions }) => {
+const Card: FC<CardProps> = ({ children, title, className = '', actions }) => {
   return (
     <div className={`bg-white dark:bg-gray-800 rounded-lg shadow-md p-6 ${className}`}>
       {(title || actions) && (

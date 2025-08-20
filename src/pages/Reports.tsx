@@ -1,5 +1,5 @@
 
-import React, { useEffect, useState, useCallback } from 'react';
+import { useEffect, useState, useCallback, type FC } from 'react';
 import api from '../services/api';
 import { Product, SalesReportData } from '../types';
 import SalesChart from '../components/SalesChart';
@@ -8,7 +8,7 @@ import Card from '../components/ui/Card';
 import Table from '../components/ui/Table';
 import { useTranslation } from '../hooks/useTranslation';
 
-const Reports: React.FC = () => {
+const Reports: FC = () => {
     const [salesData, setSalesData] = useState<SalesReportData[]>([]);
     const [lowStockProducts, setLowStockProducts] = useState<Product[]>([]);
     const [loadingSales, setLoadingSales] = useState(true);

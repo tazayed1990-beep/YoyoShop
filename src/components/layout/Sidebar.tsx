@@ -1,9 +1,9 @@
 
-import React from 'react';
+import type { FC } from 'react';
 import { NavLink } from 'react-router-dom';
 import { useTranslation } from '../../hooks/useTranslation';
 
-const Sidebar: React.FC = () => {
+const Sidebar: FC = () => {
     const { t } = useTranslation();
 
     const navItems = [

@@ -1,10 +1,10 @@
 
-import React from 'react';
+import type { ReactNode } from 'react';
 
 interface TableProps<T> {
-  columns: { header: string; accessor: keyof T | ((item: T) => React.ReactNode); }[];
+  columns: { header: string; accessor: keyof T | ((item: T) => ReactNode); }[];
   data: T[];
-  renderActions?: (item: T) => React.ReactNode;
+  renderActions?: (item: T) => ReactNode;
 }
 
 function Table<T extends { id: any }>({ columns, data, renderActions }: TableProps<T>) {

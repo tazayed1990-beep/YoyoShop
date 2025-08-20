@@ -1,9 +1,9 @@
 
-import React from 'react';
+import type { FC, ReactNode } from 'react';
 import Sidebar from './Sidebar';
 import Header from './Header';
 
-const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+const Layout: FC<{ children: ReactNode }> = ({ children }) => {
   return (
     <div className="flex h-screen bg-gray-100 dark:bg-gray-900 text-gray-800 dark:text-gray-200">
       <Sidebar />

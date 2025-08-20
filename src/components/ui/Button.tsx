@@ -1,13 +1,13 @@
 
-import React from 'react';
+import type { ButtonHTMLAttributes, FC, ReactNode } from 'react';
 
-interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
-  children: React.ReactNode;
+interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
+  children: ReactNode;
   variant?: 'primary' | 'secondary' | 'danger';
   size?: 'sm' | 'md' | 'lg';
 }
 
-const Button: React.FC<ButtonProps> = ({ children, variant = 'primary', size = 'md', className = '', ...props }) => {
+const Button: FC<ButtonProps> = ({ children, variant = 'primary', size = 'md', className = '', ...props }) => {
   const baseClasses = 'inline-flex items-center justify-center font-medium rounded-lg focus:outline-none focus:ring-4 transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed';
   
   const variantClasses = {

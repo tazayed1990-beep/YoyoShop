@@ -1,5 +1,5 @@
 
-import React, { createContext, useState, useEffect, useCallback } from 'react';
+import { createContext, useState, useEffect, useCallback, type FC, type ReactNode } from 'react';
 
 interface LanguageContextType {
   language: string;
@@ -9,7 +9,7 @@ interface LanguageContextType {
 
 export const LanguageContext = createContext<LanguageContextType | null>(null);
 
-export const LanguageProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+export const LanguageProvider: FC<{ children: ReactNode }> = ({ children }) => {
   const [language, setLanguageState] = useState(localStorage.getItem('language') || 'en');
   const [translations, setTranslations] = useState({});
 
