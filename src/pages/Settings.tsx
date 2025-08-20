@@ -25,8 +25,8 @@ const Settings: FC = () => {
         }
         setLoading(true);
         try {
-            const response = await api.get<ShopInfo>('/shop-info');
-            setShopInfo(response.data);
+            const response = await api.getShopInfo();
+            setShopInfo(response);
         } catch (error) {
             console.error("Failed to fetch shop info", error);
         } finally {
@@ -49,7 +49,8 @@ const Settings: FC = () => {
         if (!shopInfo) return;
         setIsSaving(true);
         try {
-            await api.put('/shop-info', shopInfo);
+            await api.updateShopInfo(shopInfo);
+            alert("Shop info updated successfully!");
         } catch (error) {
             console.error("Failed to save shop info", error);
         } finally {

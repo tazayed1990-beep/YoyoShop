@@ -20,11 +20,11 @@ const Invoice: FC = () => {
         setLoading(true);
         try {
             const [orderRes, shopInfoRes] = await Promise.all([
-                api.get<Order>(`/orders/${orderId}`),
-                api.get<ShopInfo>('/shop-info')
+                api.getOrder(orderId),
+                api.getShopInfo()
             ]);
-            setOrder(orderRes.data);
-            setShopInfo(shopInfoRes.data);
+            setOrder(orderRes);
+            setShopInfo(shopInfoRes);
         } catch (error) {
             console.error(`Failed to fetch invoice data for order ${orderId}`, error);
         } finally {
@@ -97,7 +97,7 @@ const Invoice: FC = () => {
                     </div>
                     <div className="text-end">
                         <h2 className="text-2xl font-semibold text-gray-700 dark:text-gray-300">{t('invoice')}</h2>
-                        <p className="text-gray-500 dark:text-gray-400">{t('invoice_number', { id: order.id })}</p>
+                        <p className="text-gray-500 dark:text-gray-400">{t('invoice_number', { id: order.id.substring(0, 8).toUpperCase() })}</p>
                         <p className="text-gray-500 dark:text-gray-400">{t('invoice_date')} {new Date(order.createdAt).toLocaleDateString()}</p>
                     </div>
                 </header>
@@ -125,8 +125,8 @@ const Invoice: FC = () => {
                             </tr>
                         </thead>
                         <tbody>
-                            {order.orderItems.map(item => (
-                                <tr key={item.id} className="border-b border-gray-200 dark:border-gray-700">
+                            {order.orderItems.map((item, index) => (
+                                <tr key={`${item.productId}-${index}`} className="border-b border-gray-200 dark:border-gray-700">
                                     <td className="p-3">{item.product?.name}</td>
                                     <td className="p-3 text-center">{item.quantity}</td>
                                     <td className="p-3 text-end">{item.price.toFixed(2)} EGP</td>

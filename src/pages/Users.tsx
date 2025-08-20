@@ -10,7 +10,7 @@ import Spinner from '../components/ui/Spinner';
 import Card from '../components/ui/Card';
 import { useTranslation } from '../hooks/useTranslation';
 
-const UserForm: FC<{ user?: User | null; onSave: (user: Omit<User, 'id' | 'createdAt'>) => void; onCancel: () => void }> = ({ user, onSave, onCancel }) => {
+const UserForm: FC<{ user?: User | null; onSave: (userData: any) => void; onCancel: () => void }> = ({ user, onSave, onCancel }) => {
     const { t } = useTranslation();
     const [formData, setFormData] = useState({
         name: user?.name || '',
@@ -32,7 +32,7 @@ const UserForm: FC<{ user?: User | null; onSave: (user: Omit<User, 'id' | 'creat
     return (
         <form onSubmit={handleSubmit} className="space-y-4">
             <Input label={t('name')} name="name" value={formData.name} onChange={handleChange} required />
-            <Input label={t('email')} name="email" type="email" value={formData.email} onChange={handleChange} required />
+            <Input label={t('email')} name="email" type="email" value={formData.email} onChange={handleChange} required disabled={!!user} />
             <Input label={t('password')} name="password" type="password" placeholder={user ? t('leave_blank_password') : ''} onChange={handleChange} required={!user} />
             <div>
                 <label htmlFor="role" className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">{t('role')}</label>
@@ -48,7 +48,7 @@ const UserForm: FC<{ user?: User | null; onSave: (user: Omit<User, 'id' | 'creat
             </div>
             <div className="flex justify-end space-x-2 pt-4">
                 <Button type="button" variant="secondary" onClick={onCancel}>{t('cancel')}</Button>
-                <Button type="submit">{t('save_user')}</Button>
+                <Button type="submit">{user ? t('save_user') : t('add_user')}</Button>
             </div>
         </form>
     );
@@ -64,8 +64,8 @@ const Users: FC = () => {
     const fetchUsers = useCallback(async () => {
         setLoading(true);
         try {
-            const response = await api.get<User[]>('/users');
-            setUsers(response.data.filter(u => u.role !== UserRole.CUSTOMER));
+            const response = await api.getUsers();
+            setUsers(response.filter(u => u.role !== UserRole.CUSTOMER));
         } catch (error) {
             console.error("Failed to fetch users", error);
         } finally {
@@ -77,25 +77,28 @@ const Users: FC = () => {
         fetchUsers();
     }, [fetchUsers]);
 
-    const handleSaveUser = async (userData: Omit<User, 'id' | 'createdAt'>) => {
+    const handleSaveUser = async (userData: any) => {
         try {
             if (editingUser) {
-                await api.put(`/users/${editingUser.id}`, userData);
+                // Don't update email or password from this form for existing users
+                const { name, role } = userData;
+                await api.updateUser(editingUser.id, { name, role });
             } else {
-                await api.post('/users', userData);
+                await api.createUser(userData);
             }
             fetchUsers();
             setIsModalOpen(false);
             setEditingUser(null);
         } catch (error) {
             console.error("Failed to save user", error);
+            // Add user-friendly error handling
         }
     };
     
-    const handleDeleteUser = async (id: number) => {
+    const handleDeleteUser = async (id: string) => {
         if (window.confirm(t('confirm_delete_user'))) {
             try {
-                await api.delete(`/users/${id}`);
+                await api.deleteUser(id);
                 fetchUsers();
             } catch (error) {
                 console.error("Failed to delete user", error);
@@ -104,7 +107,6 @@ const Users: FC = () => {
     };
 
     const columns = [
-        { header: 'ID', accessor: 'id' as keyof User },
         { header: t('name'), accessor: 'name' as keyof User },
         { header: t('email'), accessor: 'email' as keyof User },
         { header: t('role'), accessor: (item: User) => t(item.role) },

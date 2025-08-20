@@ -22,8 +22,13 @@ const Login: React.FC = () => {
     try {
       await login(email, password);
       navigate('/');
-    } catch (err) {
-      setError(t('invalid_credentials'));
+    } catch (err: any) {
+      // Firebase provides more specific error codes
+      if (err.code === 'auth/user-not-found' || err.code === 'auth/wrong-password' || err.code === 'auth/invalid-credential') {
+        setError(t('invalid_credentials'));
+      } else {
+        setError('An unexpected error occurred. Please try again.');
+      }
       console.error(err);
     } finally {
         setLoading(false);

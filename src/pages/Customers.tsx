@@ -10,7 +10,7 @@ import Spinner from '../components/ui/Spinner';
 import Card from '../components/ui/Card';
 import { useTranslation } from '../hooks/useTranslation';
 
-const CustomerForm: FC<{ user?: User | null; onSave: (user: Omit<User, 'id' | 'createdAt' | 'role'>) => void; onCancel: () => void }> = ({ user, onSave, onCancel }) => {
+const CustomerForm: FC<{ user?: User | null; onSave: (customerData: any) => void; onCancel: () => void }> = ({ user, onSave, onCancel }) => {
     const { t } = useTranslation();
     const [formData, setFormData] = useState({
         name: user?.name || '',
@@ -38,7 +38,7 @@ const CustomerForm: FC<{ user?: User | null; onSave: (user: Omit<User, 'id' | 'c
                 <textarea id="address" name="address" rows={3} value={formData.address} onChange={handleChange} className="block p-2.5 w-full text-sm text-gray-900 bg-gray-50 rounded-lg border border-gray-300 focus:ring-primary-500 focus:border-primary-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white" required></textarea>
             </div>
             <Input label={t('phone')} name="phone" value={formData.phone} onChange={handleChange} required />
-            <Input label={t('email_optional')} name="email" type="email" value={formData.email} onChange={handleChange} />
+            <Input label={t('email')} name="email" type="email" value={formData.email} onChange={handleChange} required disabled={!!user} />
             <Input label={t('password')} name="password" type="password" placeholder={user ? t('leave_blank_password') : ''} onChange={handleChange} required={!user} />
             <div className="flex justify-end space-x-2 pt-4">
                 <Button type="button" variant="secondary" onClick={onCancel}>{t('cancel')}</Button>
@@ -58,8 +58,8 @@ const Customers: FC = () => {
     const fetchCustomers = useCallback(async () => {
         setLoading(true);
         try {
-            const response = await api.get<User[]>('/users');
-            setCustomers(response.data.filter(u => u.role === UserRole.CUSTOMER));
+            const response = await api.getUsers();
+            setCustomers(response.filter(u => u.role === UserRole.CUSTOMER));
         } catch (error) {
             console.error("Failed to fetch customers", error);
         } finally {
@@ -71,13 +71,14 @@ const Customers: FC = () => {
         fetchCustomers();
     }, [fetchCustomers]);
 
-    const handleSaveCustomer = async (customerData: Omit<User, 'id' | 'createdAt' | 'role'>) => {
-        const userData = { ...customerData, role: UserRole.CUSTOMER };
+    const handleSaveCustomer = async (customerData: any) => {
+        const dataWithRole = { ...customerData, role: UserRole.CUSTOMER };
         try {
             if (editingCustomer) {
-                await api.put(`/users/${editingCustomer.id}`, userData);
+                 const { name, address, phone } = customerData;
+                await api.updateUser(editingCustomer.id, { name, address, phone });
             } else {
-                await api.post('/users', userData);
+                await api.createUser(dataWithRole);
             }
             fetchCustomers();
             setIsModalOpen(false);
@@ -87,10 +88,10 @@ const Customers: FC = () => {
         }
     };
     
-    const handleDeleteCustomer = async (id: number) => {
+    const handleDeleteCustomer = async (id: string) => {
         if (window.confirm(t('confirm_delete_customer'))) {
             try {
-                await api.delete(`/users/${id}`);
+                await api.deleteUser(id);
                 fetchCustomers();
             } catch (error) {
                 console.error("Failed to delete customer", error);
@@ -99,7 +100,6 @@ const Customers: FC = () => {
     };
 
     const columns = [
-        { header: 'ID', accessor: 'id' as keyof User },
         { header: t('name'), accessor: 'name' as keyof User },
         { header: t('phone'), accessor: 'phone' as keyof User },
         { header: t('address'), accessor: 'address' as keyof User },

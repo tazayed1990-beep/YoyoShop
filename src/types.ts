@@ -11,48 +11,45 @@ export enum UserRole {
 }
 
 export interface User {
-    id: number;
+    id: string; // Firestore document ID (uid from Auth)
     name: string;
     email?: string;
     phone?: string;
     address?: string;
     role: UserRole;
-    createdAt: string;
-    password?: string;
+    createdAt: string; // ISO string
 }
 
 export interface Product {
-    id: number;
+    id: string; // Firestore document ID
     name: string;
     description: string;
     price: number;
     stockQuantity: number;
-    createdAt: string;
+    createdAt: string; // ISO string
 }
 
 export interface OrderStatus {
-    id: number;
+    id: string; // Firestore document ID
     name: string;
     color: string;
 }
 
 export interface OrderItem {
-    id: number;
-    orderId: number;
-    productId: number;
+    productId: string;
     quantity: number;
-    price: number;
+    price: number; // Price at the time of order
     product?: Product;
 }
 
 export interface Order {
-    id: number;
-    userId: number;
+    id: string; // Firestore document ID
+    userId: string;
     user?: User;
     status: string;
     totalAmount: number;
     amountPaid: number;
-    createdAt: string;
+    createdAt: string; // ISO string
     orderItems: OrderItem[];
     deleted?: boolean;
 }

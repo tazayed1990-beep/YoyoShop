@@ -28,12 +28,12 @@ const Dashboard: FC = () => {
         const fetchStats = async () => {
             try {
                 const [usersRes, productsRes, ordersRes] = await Promise.all([
-                    api.get<User[]>('/users'),
-                    api.get<Product[]>('/products'),
-                    api.get<Order[]>('/orders'),
+                    api.getUsers(),
+                    api.getProducts(),
+                    api.getOrders(),
                 ]);
 
-                const activeOrders = ordersRes.data.filter(o => !o.deleted);
+                const activeOrders = ordersRes.filter(o => !o.deleted);
                 
                 // Completed Orders: Remaining balance is zero or less
                 const completedOrders = activeOrders.filter(o => (o.totalAmount - o.amountPaid) <= 0);
@@ -45,14 +45,14 @@ const Dashboard: FC = () => {
                 const inProgressOrdersCount = inProgressOrders.length;
                 const inProgressOrdersRemainingValue = inProgressOrders.reduce((acc, order) => acc + (order.totalAmount - order.amountPaid), 0);
                 
-                const totalCustomers = usersRes.data.filter(u => u.role === UserRole.CUSTOMER).length;
+                const totalCustomers = usersRes.filter(u => u.role === UserRole.CUSTOMER).length;
                 const totalOrdersValue = activeOrders.reduce((acc, order) => acc + order.totalAmount, 0);
                 const depositsCollected = activeOrders.reduce((acc, order) => acc + order.amountPaid, 0);
 
                 setStats({
-                    users: usersRes.data.length,
+                    users: usersRes.length,
                     customers: totalCustomers,
-                    products: productsRes.data.length,
+                    products: productsRes.length,
                     totalOrdersCount: activeOrders.length,
                     totalOrdersValue,
                     depositsCollected,

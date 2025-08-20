@@ -12,7 +12,7 @@ import Input from '../components/ui/Input';
 import { useTranslation } from '../hooks/useTranslation';
 
 // Form for updating an existing order's status and payment
-const EditOrderForm: FC<{ order: Order; statuses: OrderStatus[], onSave: (orderId: number, data: { status: string; amountPaid: number }) => void; onCancel: () => void; }> = ({ order, statuses, onSave, onCancel }) => {
+const EditOrderForm: FC<{ order: Order; statuses: OrderStatus[], onSave: (orderId: string, data: { status: string; amountPaid: number }) => void; onCancel: () => void; }> = ({ order, statuses, onSave, onCancel }) => {
     const { t } = useTranslation();
     const [status, setStatus] = useState<string>(order.status);
     const [amountPaid, setAmountPaid] = useState<number>(order.amountPaid);
@@ -32,8 +32,8 @@ const EditOrderForm: FC<{ order: Order; statuses: OrderStatus[], onSave: (orderI
             <div className="mb-4">
                 <h4 className="font-semibold mb-2">{t('items')}:</h4>
                 <ul className="max-h-32 overflow-y-auto pe-2">
-                    {order.orderItems.map(item => (
-                        <li key={item.id} className="text-sm flex justify-between">
+                    {order.orderItems.map((item, index) => (
+                        <li key={`${item.productId}-${index}`} className="text-sm flex justify-between">
                             <span>{item.quantity} x {item.product?.name || `Product ID ${item.productId}`}</span>
                             <span>{item.price.toFixed(2)} EGP</span>
                         </li>
@@ -80,9 +80,9 @@ const EditOrderForm: FC<{ order: Order; statuses: OrderStatus[], onSave: (orderI
 // Form for creating a new order
 const AddOrderForm: FC<{ customers: User[]; products: Product[]; statuses: OrderStatus[]; onSave: (orderData: any) => void; onCancel: () => void; }> = ({ customers, products, statuses, onSave, onCancel }) => {
     const { t } = useTranslation();
-    const [userId, setUserId] = useState<number | ''>('');
+    const [userId, setUserId] = useState<string>('');
     const [status, setStatus] = useState<string>(statuses[0]?.name || '');
-    const [items, setItems] = useState<{productId: number; quantity: number; name: string; price: number}[]>([]);
+    const [items, setItems] = useState<{productId: string; quantity: number; name: string; price: number}[]>([]);
     const [currentItem, setCurrentItem] = useState<{productId: string; quantity: number}>({ productId: '', quantity: 1 });
     const [amountPaid, setAmountPaid] = useState<number>(0);
 
@@ -93,7 +93,7 @@ const AddOrderForm: FC<{ customers: User[]; products: Product[]; statuses: Order
     const handleAddItem = () => {
         if (!currentItem.productId || currentItem.quantity <= 0) return;
         
-        const product = products.find(p => p.id === parseInt(currentItem.productId));
+        const product = products.find(p => p.id === currentItem.productId);
         if (!product) return;
 
         setItems(prevItems => {
@@ -107,7 +107,7 @@ const AddOrderForm: FC<{ customers: User[]; products: Product[]; statuses: Order
         setCurrentItem({ productId: '', quantity: 1 });
     };
 
-    const handleRemoveItem = (productId: number) => {
+    const handleRemoveItem = (productId: string) => {
         setItems(prev => prev.filter(item => item.productId !== productId));
     };
 
@@ -117,14 +117,21 @@ const AddOrderForm: FC<{ customers: User[]; products: Product[]; statuses: Order
             alert(t('alert_select_customer_and_item'));
             return;
         }
-        onSave({ userId, status, items: items.map(({productId, quantity}) => ({productId, quantity})), amountPaid: Number(amountPaid) });
+        const orderData = {
+            userId,
+            status,
+            totalAmount,
+            amountPaid: Number(amountPaid),
+            orderItems: items.map(({productId, quantity, price}) => ({productId, quantity, price})),
+        }
+        onSave(orderData);
     };
 
     return (
         <form onSubmit={handleSubmit} className="space-y-4">
             <div>
                 <label htmlFor="customer" className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">{t('customer_id_label')}</label>
-                <select id="customer" value={userId} onChange={e => setUserId(parseInt(e.target.value))} required className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white">
+                <select id="customer" value={userId} onChange={e => setUserId(e.target.value)} required className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white">
                     <option value="" disabled>{t('select_customer')}</option>
                     {customers.map(c => <option key={c.id} value={c.id}>{c.name}</option>)}
                 </select>
@@ -207,15 +214,15 @@ const Orders: FC = () => {
         setLoading(true);
         try {
             const [ordersRes, statusesRes, usersRes, productsRes] = await Promise.all([
-                api.get<Order[]>('/orders'),
-                api.get<OrderStatus[]>('/statuses'),
-                api.get<User[]>('/users'),
-                api.get<Product[]>('/products'),
+                api.getOrders(),
+                api.getStatuses(),
+                api.getUsers(),
+                api.getProducts(),
             ]);
-            setOrders(ordersRes.data.filter(o => !o.deleted));
-            setStatuses(statusesRes.data);
-            setCustomers(usersRes.data.filter(u => u.role === UserRole.CUSTOMER));
-            setProducts(productsRes.data);
+            setOrders(ordersRes.filter(o => !o.deleted));
+            setStatuses(statusesRes);
+            setCustomers(usersRes.filter(u => u.role === UserRole.CUSTOMER));
+            setProducts(productsRes);
         } catch (error) {
             console.error("Failed to fetch order data", error);
         } finally {
@@ -227,9 +234,9 @@ const Orders: FC = () => {
         fetchData();
     }, [fetchData]);
     
-    const handleUpdateOrder = async (orderId: number, data: { status: string; amountPaid: number }) => {
+    const handleUpdateOrder = async (orderId: string, data: { status: string; amountPaid: number }) => {
         try {
-            await api.put(`/orders/${orderId}`, data);
+            await api.updateOrder(orderId, data);
             fetchData();
             setIsEditModalOpen(false);
             setSelectedOrder(null);
@@ -240,7 +247,7 @@ const Orders: FC = () => {
 
     const handleAddOrder = async (orderData: any) => {
         try {
-            await api.post('/orders', orderData);
+            await api.createOrder(orderData);
             fetchData();
             setIsAddModalOpen(false);
         } catch (error) {
@@ -248,10 +255,10 @@ const Orders: FC = () => {
         }
     }
     
-    const handleDeleteOrder = async (id: number) => {
+    const handleDeleteOrder = async (id: string) => {
         if (window.confirm(t('confirm_delete_order'))) {
             try {
-                await api.delete(`/orders/${id}`);
+                await api.deleteOrder(id);
                 fetchData();
             } catch (error) {
                 console.error("Failed to delete order", error);
@@ -278,7 +285,7 @@ const Orders: FC = () => {
     }, [statuses]);
 
     const columns = [
-        { header: t('order_id'), accessor: 'id' as keyof Order },
+        { header: t('order_id'), accessor: (item: Order) => item.id.substring(0, 8).toUpperCase() },
         { header: t('customer'), accessor: (item: Order) => item.user?.name || `User ID: ${item.userId}`},
         { header: t('status'), accessor: (item: Order) => (
             <span className={`px-2 py-1 text-xs font-medium rounded-full ${statusColorMap[item.status] || ''}`}>
@@ -316,7 +323,7 @@ const Orders: FC = () => {
                 )}
             />
             {selectedOrder && (
-                <Modal isOpen={isEditModalOpen} onClose={() => setIsEditModalOpen(false)} title={t('order_details', { id: selectedOrder.id })}>
+                <Modal isOpen={isEditModalOpen} onClose={() => setIsEditModalOpen(false)} title={t('order_details', { id: selectedOrder.id.substring(0,8).toUpperCase() })}>
                     <EditOrderForm order={selectedOrder} statuses={statuses} onSave={handleUpdateOrder} onCancel={() => { setIsEditModalOpen(false); setSelectedOrder(null); }}/>
                 </Modal>
             )}

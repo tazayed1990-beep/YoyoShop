@@ -56,8 +56,8 @@ const Statuses: FC = () => {
     const fetchStatuses = useCallback(async () => {
         setLoading(true);
         try {
-            const response = await api.get<OrderStatus[]>('/statuses');
-            setStatuses(response.data);
+            const response = await api.getStatuses();
+            setStatuses(response);
         } catch (error) {
             console.error("Failed to fetch statuses", error);
         } finally {
@@ -72,9 +72,9 @@ const Statuses: FC = () => {
     const handleSaveStatus = async (statusData: Omit<OrderStatus, 'id'>) => {
         try {
             if (editingStatus) {
-                await api.put(`/statuses/${editingStatus.id}`, statusData);
+                await api.updateStatus(editingStatus.id, statusData);
             } else {
-                await api.post('/statuses', statusData);
+                await api.createStatus(statusData);
             }
             fetchStatuses();
             setIsModalOpen(false);
@@ -84,10 +84,10 @@ const Statuses: FC = () => {
         }
     };
     
-    const handleDeleteStatus = async (id: number) => {
+    const handleDeleteStatus = async (id: string) => {
         if (window.confirm(t('confirm_delete_status'))) {
             try {
-                await api.delete(`/statuses/${id}`);
+                await api.deleteStatus(id);
                 fetchStatuses();
             } catch (error) {
                 console.error("Failed to delete status", error);
@@ -107,7 +107,6 @@ const Statuses: FC = () => {
     };
 
     const columns = [
-        { header: 'ID', accessor: 'id' as keyof OrderStatus },
         { header: t('name'), accessor: (item: OrderStatus) => (
             <span className={`px-2 py-1 text-xs font-medium rounded-full ${colorVariants[item.color] || colorVariants.gray}`}>
                 {item.name}

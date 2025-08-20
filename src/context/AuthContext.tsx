@@ -1,12 +1,14 @@
 
 import { createContext, useState, useEffect, useCallback, type FC, type ReactNode } from 'react';
-import { User } from '../types';
+import { onAuthStateChanged, signInWithEmailAndPassword, signOut, type User as FirebaseUser } from 'firebase/auth';
+import { auth } from '../services/firebase';
 import api from '../services/api';
+import { User } from '../types';
 
 interface AuthContextType {
   isAuthenticated: boolean;
   user: User | null;
-  token: string | null;
+  firebaseUser: FirebaseUser | null;
   login: (email: string, password: string) => Promise<void>;
   logout: () => void;
   loading: boolean;
@@ -16,52 +18,53 @@ export const AuthContext = createContext<AuthContextType | null>(null);
 
 export const AuthProvider: FC<{ children: ReactNode }> = ({ children }) => {
   const [user, setUser] = useState<User | null>(null);
-  const [token, setToken] = useState<string | null>(localStorage.getItem('token'));
+  const [firebaseUser, setFirebaseUser] = useState<FirebaseUser | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
 
-  const fetchUser = useCallback(async (authToken: string) => {
-    try {
-        // This is a placeholder. A real backend would have a /api/auth/me endpoint
-        // to get the current user from the token. For now, we decode it (unsafe client-side).
-        const payload = JSON.parse(atob(authToken.split('.')[1]));
-        // In a real app, you would fetch user details from an endpoint like /api/users/me
-        // For this example, we assume the payload contains enough info.
-        setUser({ id: payload.id, name: payload.name, email: payload.email, role: payload.role, createdAt: '' });
-    } catch (error) {
-        console.error('Failed to fetch user', error);
-        setToken(null);
+  useEffect(() => {
+    const unsubscribe = onAuthStateChanged(auth, async (fbUser) => {
+      setFirebaseUser(fbUser);
+      if (fbUser) {
+        // User is signed in, get their profile from Firestore
+        try {
+          const userProfile = await api.getUserProfile(fbUser.uid);
+          if (userProfile) {
+            setUser(userProfile);
+          } else {
+            // This can happen if the user exists in Auth but not in Firestore DB
+            console.error("User profile not found in Firestore. Logging out.");
+            await signOut(auth);
+            setUser(null);
+          }
+        } catch (error) {
+          console.error("Failed to fetch user profile", error);
+          await signOut(auth);
+          setUser(null);
+        }
+      } else {
+        // User is signed out
         setUser(null);
-        localStorage.removeItem('token');
-    } finally {
-        setLoading(false);
-    }
+      }
+      setLoading(false);
+    });
+
+    // Cleanup subscription on unmount
+    return () => unsubscribe();
   }, []);
 
-  useEffect(() => {
-    if (token) {
-      fetchUser(token);
-    } else {
-      setLoading(false);
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [token]);
-
   const login = async (email: string, password: string) => {
-    const response = await api.post<{ token: string }>('/auth/login', { email, password });
-    const { token: newToken } = response.data;
-    setToken(newToken);
-    localStorage.setItem('token', newToken);
-    await fetchUser(newToken);
+    await signInWithEmailAndPassword(auth, email, password);
+    // onAuthStateChanged will handle setting the user state
   };
 
-  const logout = () => {
+  const logout = async () => {
+    await signOut(auth);
     setUser(null);
-    setToken(null);
-    localStorage.removeItem('token');
+    setFirebaseUser(null);
   };
 
   return (
-    <AuthContext.Provider value={{ isAuthenticated: !!token, user, token, login, logout, loading }}>
+    <AuthContext.Provider value={{ isAuthenticated: !!user, user, firebaseUser, login, logout, loading }}>
       {!loading && children}
     </AuthContext.Provider>
   );

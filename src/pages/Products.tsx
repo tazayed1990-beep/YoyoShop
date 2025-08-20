@@ -59,8 +59,8 @@ const Products: FC = () => {
     const fetchProducts = useCallback(async () => {
         setLoading(true);
         try {
-            const response = await api.get<Product[]>('/products');
-            setProducts(response.data);
+            const response = await api.getProducts();
+            setProducts(response);
         } catch (error) {
             console.error("Failed to fetch products", error);
         } finally {
@@ -75,9 +75,9 @@ const Products: FC = () => {
     const handleSaveProduct = async (productData: Omit<Product, 'id' | 'createdAt'>) => {
         try {
             if (editingProduct) {
-                await api.put(`/products/${editingProduct.id}`, productData);
+                await api.updateProduct(editingProduct.id, productData);
             } else {
-                await api.post('/products', productData);
+                await api.createProduct(productData);
             }
             fetchProducts();
             setIsModalOpen(false);
@@ -87,10 +87,10 @@ const Products: FC = () => {
         }
     };
     
-    const handleDeleteProduct = async (id: number) => {
+    const handleDeleteProduct = async (id: string) => {
         if (window.confirm(t('confirm_delete_product'))) {
             try {
-                await api.delete(`/products/${id}`);
+                await api.deleteProduct(id);
                 fetchProducts();
             } catch (error) {
                 console.error("Failed to delete product", error);
@@ -99,7 +99,6 @@ const Products: FC = () => {
     };
 
     const columns = [
-        { header: 'ID', accessor: 'id' as keyof Product },
         { header: t('name'), accessor: 'name' as keyof Product },
         { header: t('price'), accessor: (item: Product) => `${item.price.toFixed(2)} EGP` },
         { header: t('stock'), accessor: 'stockQuantity' as keyof Product },
