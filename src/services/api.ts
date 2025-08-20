@@ -1,20 +1,8 @@
 import { db, auth } from './firebase';
-import {
-    collection,
-    getDocs,
-    getDoc,
-    addDoc,
-    updateDoc,
-    deleteDoc,
-    doc,
-    setDoc,
-    query,
-    where,
-    Timestamp,
-    orderBy
-} from 'firebase/firestore';
-import { createUserWithEmailAndPassword } from 'firebase/auth';
-import { User, Product, Order, UserRole, OrderStatus, ShopInfo } from '../types';
+import firebase from 'firebase/compat/app';
+import { User, Product, Order, OrderStatus, ShopInfo } from '../types';
+
+const { Timestamp } = firebase.firestore;
 
 // --- Helper Functions ---
 
@@ -22,8 +10,8 @@ import { User, Product, Order, UserRole, OrderStatus, ShopInfo } from '../types'
  * Converts a Firestore document snapshot to a typed object,
  * including the document ID and converting timestamps to ISO strings.
  */
-const fromFirestore = <T>(snapshot: any): T => {
-    const data = snapshot.data();
+const fromFirestore = <T>(snapshot: firebase.firestore.DocumentSnapshot): T => {
+    const data = snapshot.data()!;
     const result: any = {
         ...data,
         id: snapshot.id,
@@ -42,26 +30,26 @@ const fromFirestore = <T>(snapshot: any): T => {
 const api = {
     // --- Users ---
     async getUsers(): Promise<User[]> {
-        const usersCol = collection(db, 'users');
-        const q = query(usersCol, orderBy('createdAt', 'desc'));
-        const snapshot = await getDocs(q);
+        const usersCol = db.collection('users');
+        const q = usersCol.orderBy('createdAt', 'desc');
+        const snapshot = await q.get();
         return snapshot.docs.map(doc => fromFirestore<User>(doc));
     },
 
     async getUserProfile(uid: string): Promise<User | null> {
-        const userDocRef = doc(db, 'users', uid);
-        const docSnap = await getDoc(userDocRef);
-        if (docSnap.exists()) {
+        const userDocRef = db.collection('users').doc(uid);
+        const docSnap = await userDocRef.get();
+        if (docSnap.exists) {
             return fromFirestore<User>(docSnap);
         }
         return null;
     },
 
     async createUser(userData: any): Promise<void> {
-        const userCredential = await createUserWithEmailAndPassword(auth, userData.email, userData.password);
-        const { uid } = userCredential.user;
-        const userDocRef = doc(db, 'users', uid);
-        await setDoc(userDocRef, {
+        const userCredential = await auth.createUserWithEmailAndPassword(userData.email, userData.password);
+        const { uid } = userCredential.user!;
+        const userDocRef = db.collection('users').doc(uid);
+        await userDocRef.set({
             name: userData.name,
             email: userData.email,
             phone: userData.phone || '',
@@ -72,44 +60,44 @@ const api = {
     },
 
     async updateUser(id: string, data: Partial<User>): Promise<void> {
-        const userDoc = doc(db, 'users', id);
-        await updateDoc(userDoc, data);
+        const userDoc = db.collection('users').doc(id);
+        await userDoc.update(data);
     },
 
     async deleteUser(id: string): Promise<void> {
         // Note: This only deletes the Firestore record, not the Firebase Auth user.
         // Deleting auth users requires the Admin SDK (backend).
-        await deleteDoc(doc(db, 'users', id));
+        await db.collection('users').doc(id).delete();
     },
 
     // --- Products ---
     async getProducts(): Promise<Product[]> {
-        const productsCol = collection(db, 'products');
-        const q = query(productsCol, orderBy('createdAt', 'desc'));
-        const snapshot = await getDocs(q);
+        const productsCol = db.collection('products');
+        const q = productsCol.orderBy('createdAt', 'desc');
+        const snapshot = await q.get();
         return snapshot.docs.map(doc => fromFirestore<Product>(doc));
     },
 
     async createProduct(data: Omit<Product, 'id' | 'createdAt'>): Promise<void> {
-        await addDoc(collection(db, 'products'), {
+        await db.collection('products').add({
             ...data,
             createdAt: Timestamp.now()
         });
     },
 
     async updateProduct(id: string, data: Partial<Product>): Promise<void> {
-        await updateDoc(doc(db, 'products', id), data);
+        await db.collection('products').doc(id).update(data);
     },
 
     async deleteProduct(id: string): Promise<void> {
-        await deleteDoc(doc(db, 'products', id));
+        await db.collection('products').doc(id).delete();
     },
     
     // --- Orders ---
     async getOrders(): Promise<Order[]> {
-        const ordersCol = collection(db, 'orders');
-        const q = query(ordersCol, orderBy('createdAt', 'desc'));
-        const orderSnapshot = await getDocs(q);
+        const ordersCol = db.collection('orders');
+        const q = ordersCol.orderBy('createdAt', 'desc');
+        const orderSnapshot = await q.get();
         
         const orders: Order[] = orderSnapshot.docs.map(doc => fromFirestore<Order>(doc));
 
@@ -132,18 +120,18 @@ const api = {
     },
     
     async getOrder(id: string): Promise<Order | null> {
-         const orderDocRef = doc(db, 'orders', id);
-         const docSnap = await getDoc(orderDocRef);
+         const orderDocRef = db.collection('orders').doc(id);
+         const docSnap = await orderDocRef.get();
 
-         if (!docSnap.exists()) return null;
+         if (!docSnap.exists) return null;
 
          const order = fromFirestore<Order>(docSnap);
 
          // Populate user and product data
          order.user = await this.getUserProfile(order.userId) ?? undefined;
          for (const item of order.orderItems) {
-             const productDoc = await getDoc(doc(db, 'products', item.productId));
-             if (productDoc.exists()) {
+             const productDoc = await db.collection('products').doc(item.productId).get();
+             if (productDoc.exists) {
                  item.product = fromFirestore<Product>(productDoc);
              }
          }
@@ -151,7 +139,7 @@ const api = {
     },
 
     async createOrder(data: any): Promise<void> {
-         await addDoc(collection(db, 'orders'), {
+         await db.collection('orders').add({
              ...data,
              deleted: false,
              createdAt: Timestamp.now()
@@ -159,37 +147,37 @@ const api = {
     },
 
     async updateOrder(id: string, data: Partial<Order>): Promise<void> {
-        await updateDoc(doc(db, 'orders', id), data);
+        await db.collection('orders').doc(id).update(data);
     },
 
     async deleteOrder(id: string): Promise<void> {
         // Soft delete
-        await updateDoc(doc(db, 'orders', id), { deleted: true });
+        await db.collection('orders').doc(id).update({ deleted: true });
     },
 
     // --- Order Statuses ---
      async getStatuses(): Promise<OrderStatus[]> {
-        const statusesCol = collection(db, 'statuses');
-        const snapshot = await getDocs(statusesCol);
+        const statusesCol = db.collection('statuses');
+        const snapshot = await statusesCol.get();
         return snapshot.docs.map(doc => fromFirestore<OrderStatus>(doc));
     },
 
     async createStatus(data: Omit<OrderStatus, 'id'>): Promise<void> {
-        await addDoc(collection(db, 'statuses'), data);
+        await db.collection('statuses').add(data);
     },
     
     async updateStatus(id: string, data: Partial<OrderStatus>): Promise<void> {
-        await updateDoc(doc(db, 'statuses', id), data);
+        await db.collection('statuses').doc(id).update(data);
     },
 
     async deleteStatus(id: string): Promise<void> {
-        await deleteDoc(doc(db, 'statuses', id));
+        await db.collection('statuses').doc(id).delete();
     },
 
     // --- Shop Info ---
     async getShopInfo(): Promise<ShopInfo | null> {
-        const infoDoc = await getDoc(doc(db, 'shop', 'info'));
-        if(infoDoc.exists()) {
+        const infoDoc = await db.collection('shop').doc('info').get();
+        if(infoDoc.exists) {
             return infoDoc.data() as ShopInfo;
         }
         // Return default info if it doesn't exist
@@ -202,13 +190,13 @@ const api = {
     },
 
     async updateShopInfo(data: ShopInfo): Promise<void> {
-        await setDoc(doc(db, 'shop', 'info'), data);
+        await db.collection('shop').doc('info').set(data);
     },
 
     // --- Reports ---
     async getLowStockProducts(): Promise<Product[]> {
-        const q = query(collection(db, 'products'), where('stockQuantity', '<', 10));
-        const snapshot = await getDocs(q);
+        const q = db.collection('products').where('stockQuantity', '<', 10);
+        const snapshot = await q.get();
         return snapshot.docs.map(doc => fromFirestore<Product>(doc));
     }
 };

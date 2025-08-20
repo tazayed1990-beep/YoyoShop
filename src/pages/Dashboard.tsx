@@ -2,7 +2,7 @@ import { useEffect, useState, useMemo, type FC } from 'react';
 import DashboardCard from '../components/DashboardCard';
 import api from '../services/api';
 import Spinner from '../components/ui/Spinner';
-import { Order, Product, User, UserRole } from '../types';
+import { UserRole } from '../types';
 import { useTranslation } from '../hooks/useTranslation';
 
 interface DashboardStats {

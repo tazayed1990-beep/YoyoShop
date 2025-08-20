@@ -1,7 +1,7 @@
 // Import the functions you need from the SDKs you need
-import { initializeApp } from "firebase/app";
-import { getAuth } from "firebase/auth";
-import { getFirestore } from "firebase/firestore";
+import firebase from 'firebase/compat/app';
+import 'firebase/compat/auth';
+import 'firebase/compat/firestore';
 
 // Your web app's Firebase configuration
 // For security, you should use environment variables to store this information
@@ -17,10 +17,13 @@ const firebaseConfig = {
 
 
 // Initialize Firebase
-const app = initializeApp(firebaseConfig);
+if (!firebase.apps.length) {
+  firebase.initializeApp(firebaseConfig);
+}
+
 
 // Initialize Firebase Authentication and get a reference to the service
-export const auth = getAuth(app);
+export const auth = firebase.auth();
 
 // Initialize Cloud Firestore and get a reference to the service
-export const db = getFirestore(app);
+export const db = firebase.firestore();
