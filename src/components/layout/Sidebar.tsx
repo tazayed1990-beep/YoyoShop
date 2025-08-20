@@ -1,9 +1,14 @@
 
-import type { FC } from 'react';
+import type { Dispatch, FC, SetStateAction } from 'react';
 import { NavLink } from 'react-router-dom';
 import { useTranslation } from '../../hooks/useTranslation';
 
-const Sidebar: FC = () => {
+interface SidebarProps {
+  isOpen: boolean;
+  setIsOpen: Dispatch<SetStateAction<boolean>>;
+}
+
+const Sidebar: FC<SidebarProps> = ({ isOpen, setIsOpen }) => {
     const { t } = useTranslation();
 
     const navItems = [
@@ -40,28 +45,55 @@ const Sidebar: FC = () => {
     const inactiveLinkClass = "flex items-center p-2 text-base font-normal text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700";
 
   return (
-    <aside className="w-64" aria-label="Sidebar">
-      <div className="overflow-y-auto py-4 px-3 h-full bg-white dark:bg-gray-800 shadow-lg">
-        <a href="#" className="flex items-center ps-2.5 mb-5">
-            <svg xmlns="http://www.w3.org/2000/svg" className="h-8 w-8 text-primary-500 me-2" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" /></svg>
-          <span className="self-center text-xl font-semibold whitespace-nowrap dark:text-white">Yoyo Shop</span>
-        </a>
-        <ul className="space-y-2">
-          {[...navItems, settingsNavItem].map((item) => (
-            <li key={item.name}>
-              <NavLink 
-                to={item.path}
-                end={item.path === '/'}
-                className={({ isActive }) => isActive ? activeLinkClass : inactiveLinkClass}
-              >
-                {item.icon}
-                <span className="ms-3">{item.name}</span>
-              </NavLink>
-            </li>
-          ))}
-        </ul>
-      </div>
-    </aside>
+    <>
+      {/* Overlay for mobile */}
+      <div
+        className={`fixed inset-0 bg-black bg-opacity-50 z-20 md:hidden transition-opacity ${isOpen ? 'opacity-100' : 'opacity-0 pointer-events-none'}`}
+        onClick={() => setIsOpen(false)}
+        aria-hidden="true"
+      ></div>
+
+      <aside
+        className={`fixed inset-y-0 left-0 z-30 w-64 bg-white dark:bg-gray-800 shadow-lg transform transition-transform duration-300 ease-in-out md:relative md:translate-x-0 md:shadow-none ${
+          isOpen ? 'translate-x-0' : '-translate-x-full'
+        }`}
+        aria-label="Sidebar"
+      >
+        <div className="overflow-y-auto py-4 px-3 h-full">
+          <div className="flex justify-between items-center ps-2.5 mb-5">
+            <a href="#" className="flex items-center">
+              <svg xmlns="http://www.w3.org/2000/svg" className="h-8 w-8 text-primary-500 me-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" />
+              </svg>
+              <span className="self-center text-xl font-semibold whitespace-nowrap dark:text-white">Yoyo Shop</span>
+            </a>
+            <button
+                className="text-gray-400 hover:bg-gray-200 dark:hover:bg-gray-700 rounded-lg p-1.5 md:hidden"
+                onClick={() => setIsOpen(false)}
+                aria-label="Close sidebar"
+            >
+                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+            </button>
+          </div>
+
+          <ul className="space-y-2">
+            {[...navItems, settingsNavItem].map((item) => (
+              <li key={item.name}>
+                <NavLink
+                  to={item.path}
+                  end={item.path === '/'}
+                  className={({ isActive }) => (isActive ? activeLinkClass : inactiveLinkClass)}
+                  onClick={() => setIsOpen(false)}
+                >
+                  {item.icon}
+                  <span className="ms-3">{item.name}</span>
+                </NavLink>
+              </li>
+            ))}
+          </ul>
+        </div>
+      </aside>
+    </>
   );
 };
 
