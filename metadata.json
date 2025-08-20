@@ -1,0 +1,5 @@
+{
+  "name": "Yoyo Shop",
+  "description": "A comprehensive system for Yoyo Shop to manage customers, products, orders, and generate sales reports. Built with React, Tailwind CSS, and Vite.",
+  "requestFramePermissions": []
+}
