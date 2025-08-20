@@ -110,9 +110,9 @@ const api = {
 
         // Populate user and product details
         for (const order of orders) {
-            order.user = userMap.get(order.userId);
+            order.user = userMap.get(order.userId) ?? undefined;
             for (const item of order.orderItems) {
-                item.product = productMap.get(item.productId);
+                item.product = productMap.get(item.productId) ?? undefined;
             }
         }
 
