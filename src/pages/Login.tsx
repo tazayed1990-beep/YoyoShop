@@ -1,12 +1,12 @@
 
-import { useState, type FC, type FormEvent } from 'react';
+import React, { useState } from 'react';
 import { useAuth } from '../hooks/useAuth';
 import { useNavigate } from 'react-router-dom';
 import Input from '../components/ui/Input';
 import Button from '../components/ui/Button';
 import { useTranslation } from '../hooks/useTranslation';
 
-const Login: FC = () => {
+const Login: React.FC = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
@@ -15,7 +15,7 @@ const Login: FC = () => {
   const navigate = useNavigate();
   const { t } = useTranslation();
 
-  const handleSubmit = async (e: FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
     setLoading(true);
