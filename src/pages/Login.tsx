@@ -7,8 +7,8 @@ import Button from '../components/ui/Button';
 import { useTranslation } from '../hooks/useTranslation';
 
 const Login: FC = () => {
-  const [email, setEmail] = useState('m.azab@hotmail.com');
-  const [password, setPassword] = useState('8520');
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
   const { login } = useAuth();
@@ -44,7 +44,7 @@ const Login: FC = () => {
             required
             value={email}
             onChange={(e) => setEmail(e.target.value)}
-            placeholder="name@company.com"
+            placeholder="user@example.com"
           />
           <Input
             label={t('password')}
@@ -55,7 +55,7 @@ const Login: FC = () => {
             required
             value={password}
             onChange={(e) => setPassword(e.target.value)}
-            placeholder="••••••••"
+            placeholder={t('password')}
           />
           {error && <p className="text-sm text-red-500 text-center">{error}</p>}
           <Button type="submit" className="w-full" disabled={loading}>

@@ -54,6 +54,7 @@ export interface Order {
     amountPaid: number;
     createdAt: string;
     orderItems: OrderItem[];
+    deleted?: boolean;
 }
 
 export interface SalesReportData {

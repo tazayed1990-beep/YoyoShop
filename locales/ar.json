@@ -89,6 +89,7 @@
     "customer_id_label": "العميل",
     "items": "العناصر",
     "update_order": "تحديث الطلب",
+    "confirm_delete_order": "هل أنت متأكد أنك تريد حذف هذا الطلب؟ سيتم أرشفة هذا الإجراء لأغراض إعداد التقارير.",
     "reports_title": "التقارير",
     "sales_report": "تقرير المبيعات",
     "daily": "يومي",
@@ -98,6 +99,8 @@
     "low_stock_products": "المنتجات ذات المخزون المنخفض",
     "product_id": "المعرف",
     "stock_left": "المخزون المتبقي",
+    "transaction_history": "سجل المعاملات",
+    "deleted": "محذوف",
     "statuses_management": "إدارة حالات الطلب",
     "add_status": "إضافة حالة",
     "edit_status": "تعديل حالة",
@@ -127,5 +130,11 @@
     "access_denied_message": "ليس لديك إذن لعرض هذه الصفحة. يرجى الاتصال بالمسؤول.",
     "error_loading_shop_info": "تعذر تحميل معلومات المتجر.",
     "language": "اللغة",
-    "language_settings": "إعدادات اللغة"
+    "language_settings": "إعدادات اللغة",
+    "deposits_collected": "العربون المحصل",
+    "completed_orders": "الطلبات المكتملة",
+    "orders_under_implementation": "طلبات قيد التنفيذ",
+    "total_value": "القيمة الإجمالية",
+    "remaining_value": "القيمة المتبقية",
+    "orders_card_subtitle": "{{count}} طلبات"
 }

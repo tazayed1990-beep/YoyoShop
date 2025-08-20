@@ -212,7 +212,7 @@ const Orders: FC = () => {
                 api.get<User[]>('/users'),
                 api.get<Product[]>('/products'),
             ]);
-            setOrders(ordersRes.data);
+            setOrders(ordersRes.data.filter(o => !o.deleted));
             setStatuses(statusesRes.data);
             setCustomers(usersRes.data.filter(u => u.role === UserRole.CUSTOMER));
             setProducts(productsRes.data);
@@ -248,6 +248,17 @@ const Orders: FC = () => {
         }
     }
     
+    const handleDeleteOrder = async (id: number) => {
+        if (window.confirm(t('confirm_delete_order'))) {
+            try {
+                await api.delete(`/orders/${id}`);
+                fetchData();
+            } catch (error) {
+                console.error("Failed to delete order", error);
+            }
+        }
+    };
+
     const statusColorMap = useMemo(() => {
         const map: { [key: string]: string } = {};
         const colorVariants: { [key: string]: string } = {
@@ -300,6 +311,7 @@ const Orders: FC = () => {
                     <div className="flex space-x-2">
                         <Button size="sm" variant="secondary" onClick={() => { setSelectedOrder(order); setIsEditModalOpen(true); }}>{t('view_edit')}</Button>
                         <Button size="sm" variant="secondary" onClick={() => navigate(`/invoice/${order.id}`)}>{t('print_invoice')}</Button>
+                        <Button size="sm" variant="danger" onClick={() => handleDeleteOrder(order.id)}>{t('delete')}</Button>
                     </div>
                 )}
             />

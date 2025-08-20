@@ -43,7 +43,8 @@ let orders: MockOrder[] = [
     orderItems: [
       { id: 1, orderId: 1, productId: 1, quantity: 1, price: 1499.99 },
       { id: 2, orderId: 1, productId: 2, quantity: 1, price: 49.99 },
-    ]
+    ],
+    deleted: false,
   },
   {
     id: 2,
@@ -55,7 +56,8 @@ let orders: MockOrder[] = [
     orderItems: [
       { id: 3, orderId: 2, productId: 4, quantity: 1, price: 399.99 },
       { id: 4, orderId: 2, productId: 3, quantity: 1, price: 129.99 },
-    ]
+    ],
+    deleted: false,
   },
   {
     id: 3,
@@ -66,7 +68,8 @@ let orders: MockOrder[] = [
     createdAt: new Date().toISOString(),
     orderItems: [
       { id: 5, orderId: 3, productId: 5, quantity: 1, price: 89.99 },
-    ]
+    ],
+    deleted: false,
   },
 ];
 
@@ -150,6 +153,7 @@ const mockApi = {
             amountPaid: amountPaid || 0,
             createdAt: new Date().toISOString(),
             orderItems,
+            deleted: false,
         };
         orders.push(newOrder);
         return mockApi.request(newOrder) as any;
@@ -277,6 +281,13 @@ const mockApi = {
     if (url.includes('/products/')) {
         products = products.filter(p => p.id !== id);
         return mockApi.request({ message: 'Product deleted' }) as any;
+    }
+     if (url.includes('/orders/')) {
+        const orderIndex = orders.findIndex(o => o.id === id);
+        if (orderIndex > -1) {
+            orders[orderIndex].deleted = true;
+            return mockApi.request({ message: 'Order marked as deleted' }) as any;
+        }
     }
     if (url.includes('/statuses/')) {
         orderStatuses = orderStatuses.filter(s => s.id !== id);
