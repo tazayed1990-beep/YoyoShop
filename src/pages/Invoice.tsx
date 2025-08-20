@@ -58,7 +58,7 @@ const Invoice: FC = () => {
                         background-color: #fff !important;
                         color: #000 !important;
                     }
-                    .dark\\:bg-gray-800, .dark\\:bg-gray-700 {
+                    .dark\\:bg-gray-800, .dark\\:bg-gray-700, .dark\\:bg-gray-900 {
                         background-color: #fff !important;
                     }
                     .dark\\:text-white, .dark\\:text-gray-200, .dark\\:text-gray-300 {

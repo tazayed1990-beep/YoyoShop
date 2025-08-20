@@ -40,22 +40,22 @@ const Login: React.FC = () => {
             id="email"
             name="email"
             type="email"
-            autoComplete="new-password"
+            autoComplete="email"
             required
             value={email}
             onChange={(e) => setEmail(e.target.value)}
-            placeholder="user@example.com"
+            placeholder="name@company.com"
           />
           <Input
             label={t('password')}
             id="password"
             name="password"
             type="password"
-            autoComplete="new-password"
+            autoComplete="current-password"
             required
             value={password}
             onChange={(e) => setPassword(e.target.value)}
-            placeholder={t('password')}
+            placeholder="••••••••"
           />
           {error && <p className="text-sm text-red-500 text-center">{error}</p>}
           <Button type="submit" className="w-full" disabled={loading}>

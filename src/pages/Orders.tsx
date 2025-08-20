@@ -308,7 +308,7 @@ const Orders: FC = () => {
                 columns={columns}
                 data={orders}
                 renderActions={(order) => (
-                    <div className="flex space-x-2">
+                    <div className="flex flex-wrap gap-2 justify-end">
                         <Button size="sm" variant="secondary" onClick={() => { setSelectedOrder(order); setIsEditModalOpen(true); }}>{t('view_edit')}</Button>
                         <Button size="sm" variant="secondary" onClick={() => navigate(`/invoice/${order.id}`)}>{t('print_invoice')}</Button>
                         <Button size="sm" variant="danger" onClick={() => handleDeleteOrder(order.id)}>{t('delete')}</Button>

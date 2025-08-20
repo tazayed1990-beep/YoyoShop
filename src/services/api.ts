@@ -278,6 +278,13 @@ const mockApi = {
         products = products.filter(p => p.id !== id);
         return mockApi.request({ message: 'Product deleted' }) as any;
     }
+    if (url.includes('/orders/')) {
+        const orderIndex = orders.findIndex(o => o.id === id);
+        if (orderIndex > -1) {
+            (orders[orderIndex] as any).deleted = true;
+            return mockApi.request({ message: 'Order marked as deleted' }) as any;
+        }
+    }
     if (url.includes('/statuses/')) {
         orderStatuses = orderStatuses.filter(s => s.id !== id);
         return mockApi.request({ message: 'Status deleted' }) as any;
