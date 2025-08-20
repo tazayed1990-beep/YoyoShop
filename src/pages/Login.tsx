@@ -40,7 +40,7 @@ const Login: FC = () => {
             id="email"
             name="email"
             type="email"
-            autoComplete="email"
+            autoComplete="new-password"
             required
             value={email}
             onChange={(e) => setEmail(e.target.value)}
@@ -51,7 +51,7 @@ const Login: FC = () => {
             id="password"
             name="password"
             type="password"
-            autoComplete="current-password"
+            autoComplete="new-password"
             required
             value={password}
             onChange={(e) => setPassword(e.target.value)}

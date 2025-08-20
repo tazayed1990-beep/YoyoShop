@@ -4,7 +4,7 @@ import { User, Product, Order, UserRole, OrderItem, OrderStatus, ShopInfo } from
 // --- Start of Mock Data ---
 // In-memory database for the mock API
 let users: User[] = [
-  { id: 1, name: 'Admin User', email: 'm.azab@hotmail.com', role: UserRole.ADMIN, createdAt: new Date().toISOString(), password: '8520' },
+  { id: 1, name: 'Admin User', email: 'admin@example.com', role: UserRole.ADMIN, createdAt: new Date().toISOString(), password: '8520' },
   { id: 2, name: 'Staff User', email: 'staff@example.com', role: UserRole.STAFF, createdAt: new Date().toISOString(), password: 'password' },
   { id: 3, name: 'Customer One', email: 'customer1@example.com', role: UserRole.CUSTOMER, createdAt: new Date().toISOString(), password: 'password', address: '123 Main St, Anytown, USA', phone: '555-1234' },
   { id: 4, name: 'Customer Two', email: 'customer2@example.com', role: UserRole.CUSTOMER, createdAt: new Date('2023-05-10T09:00:00Z').toISOString(), password: 'password', address: '456 Oak Ave, Sometown, USA', phone: '555-5678' },
