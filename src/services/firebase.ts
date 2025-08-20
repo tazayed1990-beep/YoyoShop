@@ -4,14 +4,15 @@ import { getAuth } from "firebase/auth";
 import { getFirestore } from "firebase/firestore";
 
 // Your web app's Firebase configuration
+// For security, you should use environment variables to store this information
 const firebaseConfig = {
-  apiKey: "AIzaSyDzM-fYMOsxqEJ5yhT2cfqDwRLRX9RCdNQ",
-  authDomain: "yoyo-shop-90c24.firebaseapp.com",
-  projectId: "yoyo-shop-90c24",
-  storageBucket: "yoyo-shop-90c24.appspot.com",
-  messagingSenderId: "590085992760",
-  appId: "1:590085992760:web:39fe307ab0233b724091cd",
-  measurementId: "G-L2BC412R0L"
+  apiKey: import.meta.env.VITE_FIREBASE_API_KEY,
+  authDomain: import.meta.env.VITE_FIREBASE_AUTH_DOMAIN,
+  projectId: import.meta.env.VITE_FIREBASE_PROJECT_ID,
+  storageBucket: import.meta.env.VITE_FIREBASE_STORAGE_BUCKET,
+  messagingSenderId: import.meta.env.VITE_FIREBASE_MESSAGING_SENDER_ID,
+  appId: import.meta.env.VITE_FIREBASE_APP_ID,
+  measurementId: import.meta.env.VITE_FIREBASE_MEASUREMENT_ID
 };
 
 

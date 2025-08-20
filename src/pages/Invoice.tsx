@@ -1,4 +1,3 @@
-
 import { useEffect, useState, useCallback, type FC } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import api from '../services/api';

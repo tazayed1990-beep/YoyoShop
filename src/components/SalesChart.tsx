@@ -1,4 +1,3 @@
-
 import type { FC } from 'react';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
 import { SalesReportData } from '../types';

@@ -1,4 +1,3 @@
-
 import { useEffect, useState, useCallback, useMemo, type FC } from 'react';
 import api from '../services/api';
 import { Product, SalesReportData, Order, OrderStatus } from '../types';

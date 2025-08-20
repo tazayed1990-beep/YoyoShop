@@ -1,4 +1,3 @@
-
 import type { FC } from 'react';
 
 const Spinner: FC<{ size?: string }> = ({ size = '8' }) => {

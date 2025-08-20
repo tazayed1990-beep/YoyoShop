@@ -120,17 +120,15 @@ const api = {
         const userMap = new Map(users.map(u => [u.id, u]));
         const productMap = new Map(products.map(p => [p.id, p]));
 
-        return orders.map(order => {
-            const populatedOrder: Order = {
-                ...order,
-                user: userMap.get(order.userId),
-                orderItems: order.orderItems.map(item => ({
-                    ...item,
-                    product: productMap.get(item.productId)
-                }))
-            };
-            return populatedOrder;
-        });
+        // Populate user and product details
+        for (const order of orders) {
+            order.user = userMap.get(order.userId);
+            for (const item of order.orderItems) {
+                item.product = productMap.get(item.productId);
+            }
+        }
+
+        return orders;
     },
     
     async getOrder(id: string): Promise<Order | null> {

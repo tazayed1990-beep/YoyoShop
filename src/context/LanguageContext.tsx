@@ -1,4 +1,3 @@
-
 import { createContext, useState, useEffect, useCallback, type FC, type ReactNode } from 'react';
 
 interface LanguageContextType {
